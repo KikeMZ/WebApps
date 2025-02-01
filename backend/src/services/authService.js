@@ -66,9 +66,7 @@ const resetPassword = async (email) => {
 
     // Enviar el correo de recuperación de contraseña
     await admin.auth().generatePasswordResetLink(email);
-    return {
-      message: `Correo de recuperación enviado correctamente a email: ${email}`,
-    };
+    return;
   } catch (error) {
     throw new Error(error.message);
   }

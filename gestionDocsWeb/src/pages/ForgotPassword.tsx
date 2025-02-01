@@ -6,15 +6,18 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
 
   const handleResetPassword = async () => {
+    if (!email) {
+      alert("Por favor, ingresa tu correo electrónico.");
+      return;
+    }
+
     try {
       await resetPassword(email);
-      alert("Correo de recuperación enviado");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("Ocurrió un error inesperado");
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      //
+    } finally {
+      alert("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
     }
   };
 
@@ -45,10 +48,7 @@ const ForgotPassword = () => {
 
         <p className="text-center text-gray-600 mt-4 text-sm">
           ¿Ya tienes una cuenta?{" "}
-          <Link
-            to="/"
-            className="text-blue-600 font-semibold hover:underline"
-          >
+          <Link to="/" className="text-blue-600 font-semibold hover:underline">
             Iniciar Sesión
           </Link>
         </p>
