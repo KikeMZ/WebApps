@@ -19,7 +19,15 @@ const register = async (email, password, username) => {
 
     return user;
   } catch (error) {
-    throw new Error(error.message);
+    if (
+      error.message == "The email address is already in use by another account."
+    ) {
+      throw Error(
+        "La dirección de correo electrónico está siendo usada en otra cuenta"
+      );
+    } else {
+      throw Error("Crea una contraseña más segura");
+    }
   }
 };
 
@@ -58,7 +66,9 @@ const resetPassword = async (email) => {
 
     // Enviar el correo de recuperación de contraseña
     await admin.auth().generatePasswordResetLink(email);
-    return { message: `Correo de recuperación enviado correctamente a email: ${email}` };
+    return {
+      message: `Correo de recuperación enviado correctamente a email: ${email}`,
+    };
   } catch (error) {
     throw new Error(error.message);
   }

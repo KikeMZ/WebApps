@@ -10,9 +10,19 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
+      if (!username) {
+        alert("Ingresa tu nombre de usuario");
+        return; // Evita que continúe con el registro
+      }
+
+      if (!email) {
+        alert("Ingresa tu correo electrónico");
+        return; 
+      }
+
       if (password !== Repassword) {
         alert("Las contraseñas no coinciden");
-        return; // Evita que continúe con el registro
+        return;
       }
 
       await registerUser(email, password, username);
@@ -20,8 +30,6 @@ const Register = () => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         alert(error.message);
-      } else {
-        alert("Ocurrió un error inesperado");
       }
     }
   };

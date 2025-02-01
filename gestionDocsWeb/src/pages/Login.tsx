@@ -7,6 +7,11 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Por favor, ingresa tu correo electrónico y contraseña.");
+      return;
+    }
+    
     try {
       await loginUser(email, password);
       alert("Inicio de sesión exitoso");
