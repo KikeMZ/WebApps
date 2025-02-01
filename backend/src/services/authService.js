@@ -48,4 +48,20 @@ const login = async (idToken) => {
   }
 };
 
-module.exports = { register, login };
+const resetPassword = async (email) => {
+  try {
+    // Verifica si el usuario existe en Firebase antes de enviar el enlace
+    const userRecord = await admin.auth().getUserByEmail(email);
+    if (!userRecord) {
+      throw new Error("El usuario no está registrado.");
+    }
+
+    // Enviar el correo de recuperación de contraseña
+    await admin.auth().generatePasswordResetLink(email);
+    return { message: `Correo de recuperación enviado correctamente a email: ${email}` };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+module.exports = { register, login, resetPassword };
