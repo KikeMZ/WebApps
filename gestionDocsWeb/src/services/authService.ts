@@ -39,10 +39,8 @@ export const loginUser = async (email: string, password: string) => {
     return idToken;
   } catch (error: unknown) {
     if (error instanceof FirebaseError) {
-      console.error("Error en login:", error.message);
-      throw new Error("Error al intentar iniciar sesión");
+      throw new Error("Credenciales de acceso inválidas");
     } else {
-      console.error("Error desconocido:", error);
       throw new Error("Error desconocido");
     }
   }

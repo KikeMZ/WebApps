@@ -1,26 +1,23 @@
 import { useState } from "react";
 import { loginUser } from "../services/authService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!email || !password) {
       alert("Por favor, ingresa tu correo electrónico y contraseña.");
       return;
     }
-    
+
     try {
       await loginUser(email, password);
-      alert("Inicio de sesión exitoso");
+      navigate("/dashboard"); // Redirigir a ruta protegida
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("Ocurrió un error inesperado");
-      }
+      alert(error instanceof Error ? error.message : "Error inesperado");
     }
   };
 
