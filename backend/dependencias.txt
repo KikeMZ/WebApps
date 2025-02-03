@@ -1,1 +1,1 @@
-express firebase-admin dotenv cors helmet @aws-sdk/client-s3 Busboy 
+express firebase-admin dotenv cors helmet backblaze-b2 busboy@1.4.0 

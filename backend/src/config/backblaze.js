@@ -1,15 +1,19 @@
-const { S3Client } = require("@aws-sdk/client-s3");
-const dotenv = require("dotenv");
+const B2 = require("backblaze-b2");
 
-dotenv.config();
-
-const b2 = new S3Client({
-  region: "us-east-005",
-  endpoint: "https://s3.us-east-005.backblazeb2.com",
-  credentials: {
-    accessKeyId: process.env.B2_KEY_ID,
-    secretAccessKey: process.env.B2_APP_KEY,
-  },
+const b2 = new B2({
+  applicationKeyId: process.env.B2_APP_KEY_ID,
+  applicationKey: process.env.B2_APP_KEY,
 });
 
-module.exports = b2;
+// Autorizar y exportar la instancia de B2
+const initializeB2 = async () => {
+  try {
+    await b2.authorize(); // Autorizar antes de usar
+    return b2;
+  } catch (err) {
+    console.error("Error autorizando Backblaze B2:", err);
+    throw err;
+  }
+};
+
+module.exports = { initializeB2 };

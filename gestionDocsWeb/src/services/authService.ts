@@ -1,6 +1,6 @@
 import { auth } from "./firebase";
 import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
 import axios, { AxiosError } from "axios";
 
 const API_URL = "http://localhost:3000/api/auth";
@@ -49,4 +49,32 @@ export const loginUser = async (email: string, password: string) => {
 // Recuperación de contraseña
 export const resetPassword = async (email: string) => {
   return await axios.post(`${API_URL}/forgot-password`, { email });
+};
+
+export const logout = async () => {
+  const auth = getAuth();
+
+  try {
+    return signOut(auth);
+  } catch (error: unknown) {
+    if (error instanceof FirebaseError) {
+      console.error("Error:", error.message);
+      throw new Error(error.message);
+    } else {
+      console.error("Error desconocido al cerrar sesión");
+      throw new Error("Error desconocido");
+    }
+  }
+};
+
+// Obtener el userId de la sesión actual
+export const getCurrentUserId = async (): Promise<string | null> => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    return user.uid; // Devuelve el UID del usuario autenticado
+  } else {
+    return null; // Si no hay usuario autenticado, devuelve null
+  }
 };

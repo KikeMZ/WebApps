@@ -1,44 +1,40 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+//import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import FileList from "./FileList";
 import StorageBar from "./StorageBar";
 import Toolbar from "./toolBar";
+import { logout } from "../services/authService";
+import "../services/fileService";
+import { fetchFiles, fetchStorageInfo, handleNewUpload } from "../services/fileService";
 
-interface File {
+interface StoredFile  {
   name: string;
   type: "pdf" | "document" | "spreadsheet";
 }
 
 const Dashboard = () => {
-  const [files, setFiles] = useState<File[]>([]);
-  const [filteredFiles, setFilteredFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<StoredFile[]>([]);
+  const [filteredFiles, setFilteredFiles] = useState<StoredFile[]>([]);
   const [storage, setStorage] = useState({ total: 0, used: 0 });
   const [filter, setFilter] = useState<
     "all" | "pdf" | "document" | "spreadsheet"
   >("all");
 
-  useEffect(() => {
-    axios
-      .get<{ files: File[] }>("/api/files")
-      .then((res) => {
-        setFiles(res.data.files  || []);
-        setFilteredFiles(res.data.files  || []);
-      })
-      .catch((error) => {
-        console.error("Error al cargar los archivos:", error);
-      });
+  const navigate = useNavigate();
 
-    axios
-      .get("/api/storage")
-      .then((res) => {
-        setStorage(res.data);
-      })
-      .catch((error) => {
-        console.error(
-          "Error al cargar la información de almacenamiento:",
-          error
-        );
-      });
+  useEffect(() => {
+    const loadData = async () => {
+      const fetchedFiles = await fetchFiles();
+      setFiles(fetchedFiles);
+      setFilteredFiles(fetchedFiles);
+
+      const storageData = await fetchStorageInfo();
+      setStorage(storageData);
+    };
+
+    loadData();
   }, []);
 
   // Función para manejar el cambio de filtro
@@ -50,19 +46,18 @@ const Dashboard = () => {
     else setFilteredFiles(files.filter((file) => file.type === type));
   };
 
-  const handleNewUpload = () => {
-    // Lógica para manejar la carga de nuevos archivos
-    console.log("Nuevo upload");
-  };
-
   const handleConfig = () => {
-    // Lógica para manejar la configuración
+    // window.location.href = "/config";
     console.log("Configuración");
   };
 
-  const handleLogout = () => {
-    // Lógica para manejar el cierre de sesión
-    console.log("Cierre de sesión");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Error inesperado");
+    }
   };
 
   return (
