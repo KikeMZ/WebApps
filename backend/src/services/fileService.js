@@ -20,6 +20,7 @@ const uploadFile = async (req, userId) => {
 
     bb.on("file", (fieldname, file, filename) => {
       fileName = filename.filename;
+      fileType = filename.mimeType;
       file.on("data", (data) => fileBuffer.push(data));
       file.on("end", async () => {
         try {
@@ -55,6 +56,7 @@ const uploadFile = async (req, userId) => {
               name: fileName,
               url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
               updatedAt: Date.now(),
+              fileType: fileType,
             });
 
             resolve({ id: fileId, name: fileName });
@@ -66,6 +68,7 @@ const uploadFile = async (req, userId) => {
               name: fileName,
               url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
               createdAt: Date.now(),
+              fileType: fileType,
             });
 
             resolve({ id: fileRef.key, name: fileName });

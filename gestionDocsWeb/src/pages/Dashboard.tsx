@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-//import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import FileList from "./FileList";
 import StorageBar from "./StorageBar";
-import Toolbar from "./toolBar";
+import Toolbar from "./ToolBar";
 import { logout } from "../services/authService";
 import "../services/fileService";
-import { fetchFiles, fetchStorageInfo, handleNewUpload } from "../services/fileService";
+import {
+  fetchFiles,
+  fetchStorageInfo,
+  handleNewUpload,
+} from "../services/fileService";
 
-interface StoredFile  {
+interface StoredFile {
   name: string;
   type: "pdf" | "document" | "spreadsheet";
 }

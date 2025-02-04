@@ -7,9 +7,9 @@ interface File {
 }
 
 const fileIcons = {
-  document: <FaFileAlt className="text-blue-500" />,
-  pdf: <FaFilePdf className="text-red-500" />,
-  spreadsheet: <FaFileExcel className="text-green-500" />,
+  document: <FaFileAlt className="text-blue-500 text-3xl" />,
+  pdf: <FaFilePdf className="text-red-500 text-3xl" />,
+  spreadsheet: <FaFileExcel className="text-green-500 text-3xl" />,
 };
 
 interface FileListProps {
@@ -28,7 +28,7 @@ const FileList = ({ files }: FileListProps) => {
             <div key={index} className="flex flex-col items-center">
               <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-md shadow-md">
                 {fileIcons[file.type] || (
-                  <FaFileAlt className="text-gray-500" />
+                  <FaFileAlt className="text-gray-500 text-3xl" />
                 )}
               </div>
               <span className="text-xs text-center mt-1">{file.name}</span>

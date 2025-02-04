@@ -7,6 +7,7 @@ interface StoredFile {
   id: string;
   name: string;
   type: "pdf" | "document" | "spreadsheet";
+  fileType: string; // Tipo MIME de Firebase
   url: string;
 }
 
@@ -15,13 +16,29 @@ uploadInputRef.type = "file";
 uploadInputRef.style.display = "none";
 document.body.appendChild(uploadInputRef);
 
+const mapFileType = (mimeType: string): "pdf" | "document" | "spreadsheet" => {
+  if (mimeType.includes("pdf")) return "pdf";
+  if (
+    mimeType.includes("word") ||
+    mimeType.includes("msword") ||
+    mimeType.includes("text")
+  )
+    return "document";
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel"))
+    return "spreadsheet";
+  return "document"; // Valor por defecto
+};
+
 export const fetchFiles = async (): Promise<StoredFile[]> => {
   try {
     const userId = await getCurrentUserId();
     const res = await axios.get<{ files: StoredFile[] }>(
       `${API_URL}/files/list/${userId}`
     );
-    return res.data.files || [];
+    return res.data.files.map((file) => ({
+      ...file,
+      type: mapFileType(file.fileType),
+    }));
   } catch (error) {
     console.error("Error al cargar los archivos:", error);
     return [];

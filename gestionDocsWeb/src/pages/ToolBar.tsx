@@ -1,56 +1,72 @@
-import { FaPlus, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaFilePdf,
+  FaFileWord,
+  FaFileExcel,
+  FaThLarge,
+  FaPlus,
+  FaUserCircle,
+  FaSignOutAlt,
+} from "react-icons/fa";
+
+type FilterType = "all" | "pdf" | "document" | "spreadsheet";
 
 interface ToolbarProps {
-  onFilterChange: (type: "all" | "pdf" | "document" | "spreadsheet") => void; // Tipo de la función de filtro
+  selectedFilter: FilterType;
+  onFilterChange: (filter: FilterType) => void;
   onNewUpload: () => void;
   onConfig: () => void;
   onLogout: () => void;
-  selectedFilter: "all" | "pdf" | "document" | "spreadsheet";
 }
 
 const Toolbar = ({
+  selectedFilter,
   onFilterChange,
   onNewUpload,
   onConfig,
   onLogout,
-  selectedFilter,
 }: ToolbarProps) => {
+  const filterOptions = [
+    {
+      type: "all" as const,
+      label: "Todos",
+      icon: <FaThLarge />,
+      bg: "bg-neutral-100",
+    },
+    {
+      type: "pdf" as const,
+      label: "PDF",
+      icon: <FaFilePdf />,
+      bg: "bg-red-100",
+    },
+    {
+      type: "document" as const,
+      label: "Documentos",
+      icon: <FaFileWord />,
+      bg: "bg-sky-100",
+    },
+    {
+      type: "spreadsheet" as const,
+      label: "Hojas de Cálculo",
+      icon: <FaFileExcel />,
+      bg: "bg-green-100",
+    },
+  ];
   return (
     <div className="flex flex-col md:flex-row w-full max-w-lg md:max-w-4xl gap-5 py-4 mt-4 justify-between">
       {/* Botones de filtros */}
       <div className="flex bg-white p-3 rounded-lg shadow-md gap-2 w-full md:max-w-3/4 justify-center">
-        <button
-          className={`bg-gray-300 px-4 py-2 rounded-md w-full md:w-1/4 ${
-            selectedFilter === "all" ? "bg-neutral-100" : ""
-          }`}
-          onClick={() => onFilterChange("all")}
-        >
-          Todos
-        </button>
-        <button
-          className={`bg-gray-300 px-4 py-2 rounded-md w-full md:w-1/4 ${
-            selectedFilter === "pdf" ? "bg-red-100" : ""
-          }`}
-          onClick={() => onFilterChange("pdf")}
-        >
-          PDF
-        </button>
-        <button
-          className={`bg-gray-300 px-4 py-2 rounded-md w-full md:w-1/4 ${
-            selectedFilter === "document" ? "bg-sky-100" : ""
-          }`}
-          onClick={() => onFilterChange("document")}
-        >
-          Documentos
-        </button>
-        <button
-          className={`bg-gray-300 px-4 py-2 rounded-md w-full md:w-1/4 ${
-            selectedFilter === "spreadsheet" ? "bg-green-100" : ""
-          }`}
-          onClick={() => onFilterChange("spreadsheet")}
-        >
-          Hojas de Cálculo
-        </button>
+        {filterOptions.map(({ type, label, icon, bg }) => (
+          <button
+            key={type}
+            className={`bg-gray-300 px-4 py-2 rounded-md w-full md:w-1/4 flex items-center justify-center ${
+              selectedFilter === type ? bg : ""
+            }`}
+            onClick={() => onFilterChange(type)}
+          >
+            <span className="md:hidden">{icon}</span>
+            <span className="hidden md:flex">{label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Botones de acción */}
