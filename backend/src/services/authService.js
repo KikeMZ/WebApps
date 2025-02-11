@@ -12,7 +12,9 @@ const register = async (email, password, username) => {
       username,
       email,
       dateCuenta: new Date().toISOString(),
-      profilePicture: "url", // Puedes cambiarlo si tienes una imagen por defecto
+      profilePicture:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Sample_User_Icon.svg/256px-Sample_User_Icon.svg.png?20240903184054",
+      storageLimit: 1,
     };
 
     await admin.database().ref(`users/${user.uid}`).set(userData);

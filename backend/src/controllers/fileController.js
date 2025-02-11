@@ -49,4 +49,20 @@ const deleteFile = async (req, res) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, deleteFile };
+const getStorage = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: "Se requiere un userId" });
+    }
+
+    const { total, used } = await fileService.getStorage(userId);
+
+    res.status(200).json({ total, used });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { uploadFile, getFiles, deleteFile, getStorage };

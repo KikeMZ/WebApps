@@ -13,6 +13,8 @@ const uploadFile = async (req, userId) => {
 
     let fileBuffer = [];
     let fileName = "";
+    let fileSize = 0;
+    let fileType = "";
 
     if (!userId) {
       return reject(new Error("Se requiere un userId"));
@@ -21,10 +23,41 @@ const uploadFile = async (req, userId) => {
     bb.on("file", (fieldname, file, filename) => {
       fileName = filename.filename;
       fileType = filename.mimeType;
-      file.on("data", (data) => fileBuffer.push(data));
+      file.on("data", (data) => {
+        fileBuffer.push(data);
+        fileSize += data.length; // Acumulamos el tamaño de cada chunk
+      });
+
       file.on("end", async () => {
         try {
           const finalBuffer = Buffer.concat(fileBuffer);
+          const fileSizeMB = fileSize / (1024 * 1024);
+
+          // Obtener el espacio actual del usuario
+          const { total, used } = await getStorage(userId);
+
+          // Verificar si el archivo ya existe en la base de datos
+          const fileSnapshot = await db
+            .ref(`users/${userId}/files`)
+            .orderByChild("name")
+            .equalTo(fileName)
+            .once("value");
+
+          let existingFileSizeMB = 0;
+
+          if (fileSnapshot.exists()) {
+            const fileData = fileSnapshot.val();
+            const fileId = Object.keys(fileData)[0];
+            existingFileSizeMB = fileData[fileId].fileSize || 0;
+          }
+
+          const newUsed = used - existingFileSizeMB + fileSizeMB;
+
+          if (newUsed > total) {
+            return reject(
+              new Error("Error subiendo archivo: Sin espacio suficiente")
+            );
+          }
 
           const response = await b2.getUploadUrl({
             bucketId: bucketId,
@@ -40,13 +73,6 @@ const uploadFile = async (req, userId) => {
             data: finalBuffer,
           });
 
-          // Verificar si el archivo ya existe en la base de datos
-          const fileSnapshot = await db
-            .ref(`users/${userId}/files`)
-            .orderByChild("name")
-            .equalTo(fileName)
-            .once("value");
-
           if (fileSnapshot.exists()) {
             // Si existe, actualiza el archivo
             const fileId = Object.keys(fileSnapshot.val())[0]; // Obtener el ID del archivo existente
@@ -57,6 +83,7 @@ const uploadFile = async (req, userId) => {
               url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
               updatedAt: Date.now(),
               fileType: fileType,
+              fileSize: fileSizeMB,
             });
 
             resolve({ id: fileId, name: fileName });
@@ -69,6 +96,7 @@ const uploadFile = async (req, userId) => {
               url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
               createdAt: Date.now(),
               fileType: fileType,
+              fileSize: fileSizeMB,
             });
 
             resolve({ id: fileRef.key, name: fileName });
@@ -133,4 +161,31 @@ const deleteFile = async (userId, fileId) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, deleteFile };
+const getStorage = async (userId) => {
+  try {
+    const snapshot = await db.ref(`users/${userId}/files`).once("value");
+    let used = 0;
+
+    if (snapshot.exists()) {
+      const filesData = snapshot.val();
+
+      used = Object.values(filesData).reduce(
+        (acc, file) => acc + (file.fileSize || 0),
+        0
+      );
+    }
+
+    const storageSnapshot = await db
+      .ref(`users/${userId}/storageLimit`)
+      .once("value");
+
+    const totalGB = storageSnapshot.val() || 0;
+    const total = totalGB * 1024;
+
+    return { total, used };
+  } catch (error) {
+    throw new Error("Error obteniendo datos");
+  }
+};
+
+module.exports = { uploadFile, getFiles, deleteFile, getStorage };

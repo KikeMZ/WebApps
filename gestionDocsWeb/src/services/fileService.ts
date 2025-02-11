@@ -47,7 +47,8 @@ export const fetchFiles = async (): Promise<StoredFile[]> => {
 
 export const fetchStorageInfo = async () => {
   try {
-    const res = await axios.get(`${API_URL}/files/storage`);
+    const userId = await getCurrentUserId();
+    const res = await axios.get(`${API_URL}/files/storage/${userId}`);
     return res.data;
   } catch (error) {
     console.error("Error al cargar la información de almacenamiento:", error);

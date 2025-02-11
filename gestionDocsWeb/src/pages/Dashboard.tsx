@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import FileList from "./FileList";
 import StorageBar from "./StorageBar";
 import Toolbar from "./ToolBar";
+import FileDetailSlider from "./FileDetailSlider";
 import { logout } from "../services/authService";
 import "../services/fileService";
 import {
@@ -24,6 +25,9 @@ const Dashboard = () => {
   const [filter, setFilter] = useState<
     "all" | "pdf" | "document" | "spreadsheet"
   >("all");
+
+  const [selectedFile, setSelectedFile] = useState<StoredFile | null>(null);
+  const [isSliderOpen, setIsSliderOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -63,6 +67,15 @@ const Dashboard = () => {
     }
   };
 
+  const handleFileClick = async (file: StoredFile) => {
+    setSelectedFile(file);
+    setIsSliderOpen(true);
+  };
+
+  const handleCloseSlider = () => {
+    setIsSliderOpen(false);
+  };
+
   return (
     <div className="flex flex-col items-center h-screen bg-gray-100 overflow-auto p-4">
       <Toolbar
@@ -72,8 +85,13 @@ const Dashboard = () => {
         onLogout={handleLogout}
         selectedFilter={filter}
       />
-      <FileList files={filteredFiles} />
+      <FileList files={filteredFiles} onFileClick={handleFileClick} />
       <StorageBar total={storage.total} used={storage.used} />
+
+      {/* Panel Deslizante */}
+      {isSliderOpen && selectedFile && (
+        <FileDetailSlider file={selectedFile} onClose={handleCloseSlider} />
+      )}
     </div>
   );
 };

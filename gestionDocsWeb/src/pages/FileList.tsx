@@ -1,7 +1,7 @@
 import { FaFileAlt, FaFilePdf, FaFileExcel } from "react-icons/fa";
 
 // Definir el tipo de archivo
-interface File {
+interface StoredFile {
   name: string;
   type: "pdf" | "document" | "spreadsheet";
 }
@@ -13,10 +13,11 @@ const fileIcons = {
 };
 
 interface FileListProps {
-  files: File[]; // Definir correctamente que 'files' es un arreglo de objetos 'File'
+  files: StoredFile[]; // Definir correctamente que 'files' es un arreglo de objetos 'File'
+  onFileClick: (file: StoredFile) => void;
 }
 
-const FileList = ({ files }: FileListProps) => {
+const FileList = ({ files, onFileClick }: FileListProps) => {
   // Asegurarse de que 'files' nunca sea undefined o null
   const validFiles = files || [];
 
@@ -26,7 +27,10 @@ const FileList = ({ files }: FileListProps) => {
         {validFiles.length > 0 ? (
           validFiles.map((file, index) => (
             <div key={index} className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-md shadow-md">
+              <div
+                className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-md shadow-md"
+                onClick={() => onFileClick(file)}
+              >
                 {fileIcons[file.type] || (
                   <FaFileAlt className="text-gray-500 text-3xl" />
                 )}
