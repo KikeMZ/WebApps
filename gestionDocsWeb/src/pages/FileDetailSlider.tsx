@@ -1,17 +1,13 @@
 import { FaFilePdf, FaTrash, FaDownload, FaEdit } from "react-icons/fa";
 
-/*interface StoredFile {
+interface StoredFile {
+  type: "pdf" | "document" | "spreadsheet";
   id: number;
   name: string;
   fileSize: number;
   fileType: string;
   url: string;
   createdAt: string;
-}*/
-
-interface StoredFile {
-  name: string;
-  type: "pdf" | "document" | "spreadsheet";
 }
 
 interface FileDetailSliderProps {
@@ -39,7 +35,7 @@ const FileDetailSlider = ({ file, onClose }: FileDetailSliderProps) => {
           <p className="text-sm text-gray-500">
             Fecha de subida: {file.createdAt}
           </p>
-          <p className="text-sm text-gray-500">Tamaño: {file.fileSize}</p>
+          <p className="text-sm text-gray-500">Tamaño: {file.fileSize.toFixed(2)} MB</p>
         </div>
       </div>
 

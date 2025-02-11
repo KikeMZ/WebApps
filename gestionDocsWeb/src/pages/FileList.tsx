@@ -2,8 +2,13 @@ import { FaFileAlt, FaFilePdf, FaFileExcel } from "react-icons/fa";
 
 // Definir el tipo de archivo
 interface StoredFile {
-  name: string;
   type: "pdf" | "document" | "spreadsheet";
+  id: number;
+  name: string;
+  fileSize: number;
+  fileType: string;
+  url: string;
+  createdAt: string;
 }
 
 const fileIcons = {

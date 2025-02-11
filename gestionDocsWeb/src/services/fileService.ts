@@ -4,11 +4,13 @@ import { getCurrentUserId } from "./authService";
 const API_URL = "http://localhost:3000/api";
 
 interface StoredFile {
-  id: string;
-  name: string;
   type: "pdf" | "document" | "spreadsheet";
-  fileType: string; // Tipo MIME de Firebase
+  id: number;
+  name: string;
+  fileSize: number;
+  fileType: string;
   url: string;
+  createdAt: string;
 }
 
 const uploadInputRef = document.createElement("input");
