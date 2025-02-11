@@ -1,8 +1,17 @@
-import { FaFilePdf, FaTrash, FaDownload, FaEdit } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaFilePdf,
+  FaFileExcel,
+  FaTrash,
+  FaDownload,
+  FaEdit,
+} from "react-icons/fa";
+
+import { download } from "./../services/fileService";
 
 interface StoredFile {
   type: "pdf" | "document" | "spreadsheet";
-  id: number;
+  id: string;
   name: string;
   fileSize: number;
   fileType: string;
@@ -10,10 +19,25 @@ interface StoredFile {
   createdAt: string;
 }
 
+const fileIcons = {
+  document: <FaFileAlt className="text-blue-500 text-6xl" />,
+  pdf: <FaFilePdf className="text-red-500 text-6xl" />,
+  spreadsheet: <FaFileExcel className="text-green-500 text-6xl" />,
+};
+
 interface FileDetailSliderProps {
   file: StoredFile;
   onClose: () => void;
 }
+
+const handleDownload = async (file: StoredFile) => {
+  try {
+    const url = await download(file.id);
+    window.open(url, "_blank"); // Abrir en una nueva pestaña
+  } catch (error) {
+    console.error("Error al descargar:", error);
+  }
+};
 
 const FileDetailSlider = ({ file, onClose }: FileDetailSliderProps) => {
   return (
@@ -26,7 +50,9 @@ const FileDetailSlider = ({ file, onClose }: FileDetailSliderProps) => {
       </div>
 
       <div className="flex items-center space-x-4 mt-4">
-        <FaFilePdf className="text-red-500 text-6xl" />
+        {fileIcons[file.type] || (
+          <FaFileAlt className="text-gray-500 text-6xl" />
+        )}
         <div>
           <p className="text-lg font-semibold">{file.name}</p>
           <p className="text-sm text-gray-500">
@@ -35,18 +61,23 @@ const FileDetailSlider = ({ file, onClose }: FileDetailSliderProps) => {
           <p className="text-sm text-gray-500">
             Fecha de subida: {file.createdAt}
           </p>
-          <p className="text-sm text-gray-500">Tamaño: {file.fileSize.toFixed(2)} MB</p>
+          <p className="text-sm text-gray-500">
+            Tamaño: {file.fileSize.toFixed(2)} MB
+          </p>
         </div>
       </div>
 
       <div className="flex justify-around mt-6">
-        <button className="flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+        <button className="flex items-center px-2 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600">
           <FaTrash className="mr-2" /> Eliminar
         </button>
-        <button className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+        <button
+          className="flex items-center px-2 py-2 bg-indigo-500 text-white rounded-3xl hover:bg-indigo-600"
+          onClick={() => handleDownload(file)}
+        >
           <FaDownload className="mr-2" /> Descargar
         </button>
-        <button className="flex items-center px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">
+        <button className="flex items-center px-2 py-2 bg-gray-400 text-white rounded-3xl hover:bg-gray-500">
           <FaEdit className="mr-2" /> Editar
         </button>
       </div>

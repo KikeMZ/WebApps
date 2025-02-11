@@ -5,7 +5,7 @@ const API_URL = "http://localhost:3000/api";
 
 interface StoredFile {
   type: "pdf" | "document" | "spreadsheet";
-  id: number;
+  id: string;
   name: string;
   fileSize: number;
   fileType: string;
@@ -129,5 +129,20 @@ export const deleteFile = async (fileId: string) => {
     }
   } catch (error) {
     console.error("Error al eliminar el archivo:", error);
+  }
+};
+
+export const download = async (fileId: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/files/download/${fileId}`);
+
+    if (response.status !== 200) {
+      console.error("No se pudo obtener la URL de descarga.");
+      return;
+    }
+
+    return response.data.authDownloadUrl;
+  } catch (error) {
+    console.error("Error obteniendo URL:", error);
   }
 };

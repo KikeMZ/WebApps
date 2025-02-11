@@ -15,7 +15,7 @@ import {
 
 interface StoredFile {
   type: "pdf" | "document" | "spreadsheet";
-  id: number;
+  id: string;
   name: string;
   fileSize: number;
   fileType: string;

@@ -65,4 +65,20 @@ const getStorage = async (req, res) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, deleteFile, getStorage };
+const urlDownload = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+
+    if (!fileId) {
+      return res.status(400).json({ error: "Se requiere un userId y fileId" });
+    }
+
+    const authDownloadUrl = await fileService.getDownloadUrl(userId, fileId);
+
+    res.status(200).json({ authDownloadUrl });
+  } catch (error) {
+    res.status(500).json({ error: "No se pudo generar la URL de descarga." });
+  }
+};
+
+module.exports = { uploadFile, getFiles, deleteFile, getStorage, urlDownload };

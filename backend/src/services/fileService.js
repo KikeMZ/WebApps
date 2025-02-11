@@ -94,7 +94,7 @@ const uploadFile = async (req, userId) => {
               id: fileRef.key,
               name: fileName,
               url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
-              createdAt: Date.now(),
+              createdAt: new Date().toISOString(),
               fileType: fileType,
               fileSize: fileSizeMB,
             });
@@ -188,4 +188,34 @@ const getStorage = async (userId) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, deleteFile, getStorage };
+const getDownloadUrl = async (fileId) => {
+  try {
+    const b2 = await initializeB2();
+    await b2.authorize();
+
+    // Obtener la información del archivo
+    const fileInfo = await b2.getFileInfo({ fileId });
+
+    // Obtener autorización para descargar el archivo
+    const authResponse = await b2.getDownloadAuthorization({
+      bucketId: bucketId,
+      fileNamePrefix: fileInfo.data.fileName,
+      validDurationInSeconds: 500, // URL válida por 1 hora
+    });
+
+    // Construir la URL de descarga con autorización
+    const downloadUrl = `https://api.backblazeb2.com/b2api/v2/b2_download_file_by_id?fileId=${fileId}&Authorization=${authResponse.data.authorizationToken}`;
+
+    return downloadUrl;
+  } catch (error) {
+    throw new Error("Error");
+  }
+};
+
+module.exports = {
+  uploadFile,
+  getFiles,
+  deleteFile,
+  getStorage,
+  getDownloadUrl,
+};
