@@ -32,10 +32,22 @@ interface FileDetailSliderProps {
 
 const handleDownload = async (file: StoredFile) => {
   try {
-    const url = await download(file.id);
-    window.open(url, "_blank"); // Abrir en una nueva pestaña
+    const response = await download(file.id);
+
+    if (!response) {
+      return;
+    }
+    
+    // Crear un enlace de descarga temporal
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   } catch (error) {
-    console.error("Error al descargar:", error);
+    console.error("Error al descargar el archivo:", error);
   }
 };
 

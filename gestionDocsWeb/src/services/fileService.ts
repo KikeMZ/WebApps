@@ -107,6 +107,9 @@ const uploadFile = async (file: File) => {
 
     console.log("Archivo subido con éxito", response.data);
 
+    // Despachar un evento personalizado para notificar que se subió un archivo
+    document.dispatchEvent(new Event("file-uploaded"));
+
     // Eliminar el botón flotante después de subir
     document.getElementById("floating-upload-btn")?.remove();
   } catch (error) {
@@ -134,14 +137,16 @@ export const deleteFile = async (fileId: string) => {
 
 export const download = async (fileId: string) => {
   try {
-    const response = await axios.get(`${API_URL}/files/download/${fileId}`);
+    const response = await axios.get(`${API_URL}/files/download/${fileId}`, {
+      responseType: "blob", // Indicar que la respuesta será un archivo (blob)
+    });
 
     if (response.status !== 200) {
       console.error("No se pudo obtener la URL de descarga.");
       return;
     }
 
-    return response.data.authDownloadUrl;
+    return response;
   } catch (error) {
     console.error("Error obteniendo URL:", error);
   }

@@ -12,6 +12,7 @@ import {
   fetchStorageInfo,
   handleNewUpload,
 } from "../services/fileService";
+import ProgressBar from "../components/progressBar";
 
 interface StoredFile {
   type: "pdf" | "document" | "spreadsheet";
@@ -31,6 +32,8 @@ const Dashboard = () => {
     "all" | "pdf" | "document" | "spreadsheet"
   >("all");
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const [selectedFile, setSelectedFile] = useState<StoredFile | null>(null);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
 
@@ -47,6 +50,28 @@ const Dashboard = () => {
     };
 
     loadData();
+
+    // Agregar listener para actualizar la información tras una subida
+    const handleFileUploaded = () => {
+      loadData();
+      setUploadProgress(0);
+    };
+
+    // Listener para actualizar el progreso de la subida
+    const handleUploadProgress = (event: Event) => {
+      const customEvent = event as CustomEvent<number>;
+      setUploadProgress(customEvent.detail);
+    };
+
+    // Agrega los listeners
+    document.addEventListener("file-uploaded", handleFileUploaded);
+    document.addEventListener("upload-progress", handleUploadProgress);
+
+    // Limpia los listeners al desmontar el componente
+    return () => {
+      document.removeEventListener("file-uploaded", handleFileUploaded);
+      document.removeEventListener("upload-progress", handleUploadProgress);
+    };
   }, []);
 
   // Función para manejar el cambio de filtro
@@ -90,6 +115,9 @@ const Dashboard = () => {
         onLogout={handleLogout}
         selectedFilter={filter}
       />
+      {uploadProgress > 0 && uploadProgress < 100 && (
+        <ProgressBar progress={uploadProgress} />
+      )}
       <FileList files={filteredFiles} onFileClick={handleFileClick} />
       <StorageBar total={storage.total} used={storage.used} />
 

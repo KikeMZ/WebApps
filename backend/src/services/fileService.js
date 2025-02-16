@@ -15,6 +15,7 @@ const uploadFile = async (req, userId) => {
     let fileName = "";
     let fileSize = 0;
     let fileType = "";
+    //const totalBytes = req.headers["content-length"];
 
     if (!userId) {
       return reject(new Error("Se requiere un userId"));
@@ -23,6 +24,7 @@ const uploadFile = async (req, userId) => {
     bb.on("file", (fieldname, file, filename) => {
       fileName = filename.filename;
       fileType = filename.mimeType;
+
       file.on("data", (data) => {
         fileBuffer.push(data);
         fileSize += data.length; // Acumulamos el tamaño de cada chunk
@@ -66,40 +68,43 @@ const uploadFile = async (req, userId) => {
           const authorizationToken = response.data.authorizationToken;
           const uploadUrl = response.data.uploadUrl;
 
-          await b2.uploadFile({
+          const uploadResponse = await b2.uploadFile({
             uploadUrl: uploadUrl,
             uploadAuthToken: authorizationToken,
             fileName: fileName,
             data: finalBuffer,
           });
 
+          const backblazeFileId = uploadResponse.data.fileId;
+
           if (fileSnapshot.exists()) {
             // Si existe, actualiza el archivo
-            const fileId = Object.keys(fileSnapshot.val())[0]; // Obtener el ID del archivo existente
+            const fileId = Object.keys(fileSnapshot.val())[0];
+
+            // Obtener el ID del archivo existente
             const fileRef = db.ref(`users/${userId}/files/${fileId}`);
 
             await fileRef.update({
+              id: backblazeFileId,
               name: fileName,
-              url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
-              updatedAt: Date.now(),
+              updatedAt: new Date().toISOString(),
               fileType: fileType,
               fileSize: fileSizeMB,
             });
 
-            resolve({ id: fileId, name: fileName });
+            resolve({ id: backblazeFileId, name: fileName });
           } else {
             // Si no existe, agrega el archivo
             const fileRef = db.ref(`users/${userId}/files`).push();
             await fileRef.set({
-              id: fileRef.key,
+              id: backblazeFileId,
               name: fileName,
-              url: `https://f005.backblazeb2.com/${bucketName}/${fileName}`,
               createdAt: new Date().toISOString(),
               fileType: fileType,
               fileSize: fileSizeMB,
             });
 
-            resolve({ id: fileRef.key, name: fileName });
+            resolve({ id: backblazeFileId, name: fileName });
           }
         } catch (error) {
           reject(new Error(`Error subiendo archivo: ${error.message}`));
@@ -193,22 +198,15 @@ const getDownloadUrl = async (fileId) => {
     const b2 = await initializeB2();
     await b2.authorize();
 
-    // Obtener la información del archivo
-    const fileInfo = await b2.getFileInfo({ fileId });
-
-    // Obtener autorización para descargar el archivo
-    const authResponse = await b2.getDownloadAuthorization({
-      bucketId: bucketId,
-      fileNamePrefix: fileInfo.data.fileName,
-      validDurationInSeconds: 500, // URL válida por 1 hora
+    const response = await b2.downloadFileById({
+      fileId: fileId,
+      responseType: "stream",
     });
 
-    // Construir la URL de descarga con autorización
-    const downloadUrl = `https://api.backblazeb2.com/b2api/v2/b2_download_file_by_id?fileId=${fileId}&Authorization=${authResponse.data.authorizationToken}`;
-
-    return downloadUrl;
+    return response;
   } catch (error) {
-    throw new Error("Error");
+    console.log(error);
+    throw new Error(error.message || "Error desconocido");
   }
 };
 

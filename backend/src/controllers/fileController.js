@@ -8,7 +8,7 @@ const uploadFile = async (req, res) => {
     }
 
     // Llamar al servicio para subir el archivo, pasando el userId
-    const result = await fileService.uploadFile(req, userId);
+    await fileService.uploadFile(req, userId);
 
     return res.status(200).json({ message: "Archivo subido con éxito" });
   } catch (error) {
@@ -70,15 +70,64 @@ const urlDownload = async (req, res) => {
     const { fileId } = req.params;
 
     if (!fileId) {
-      return res.status(400).json({ error: "Se requiere un userId y fileId" });
+      return res.status(400).json({ error: "Se requiere un fileId" });
     }
 
-    const authDownloadUrl = await fileService.getDownloadUrl(userId, fileId);
+    const respuesta = await fileService.getDownloadUrl(fileId);
 
-    res.status(200).json({ authDownloadUrl });
+    const contentType = respuesta.headers["content-type"];
+    const fileName = respuesta.headers["x-bz-file-name"];
+
+    // Configurar los encabezados de la respuesta para que se descargue el archivo
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+    // Enviar el archivo como un stream al cliente
+    respuesta.data.pipe(res);
   } catch (error) {
-    res.status(500).json({ error: "No se pudo generar la URL de descarga." });
+    res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { uploadFile, getFiles, deleteFile, getStorage, urlDownload };
+/*const trackUploadProgress = (req, res) => {
+  const { userId } = req.params;
+
+  // Configurar los encabezados para SSE
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  // Agrega el cliente al mapa de clientes
+  clients.set(userId, res);
+
+  // Elimina el cliente al cerrar la conexión
+  req.on("close", () => {
+    clients.delete(userId);
+  });
+};
+
+// Función para enviar el progreso a los clientes conectados
+const sendProgressUpdate = (userId, progress) => {
+  const client = clients.get(userId);
+  if (client) {
+    client.write(`data: ${progress}\n\n`);
+
+    // Si el progreso llega al 100%, se envía un evento "end"
+    if (progress === 100) {
+      client.write("event: end\n");
+      client.write("data: done\n\n");
+      client.end();
+    }
+  }
+};*/
+
+module.exports = {
+  uploadFile,
+  getFiles,
+  deleteFile,
+  getStorage,
+  urlDownload,
+  //trackUploadProgress,
+  //sendProgressUpdate,
+};
