@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import FileList from "./FileList";
-import StorageBar from "./StorageBar";
-import Toolbar from "./ToolBar";
-import FileDetailSlider from "./FileDetailSlider";
+import FileList from "../components/FileList";
+import StorageBar from "../components/StorageBar";
+import Toolbar from "../components/ToolBar";
+import FileDetailSlider from "../components/FileDetailSlider";
 import { logout } from "../services/authService";
 import "../services/fileService";
 import {
@@ -40,15 +40,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadData = async () => {
-      const fetchedFiles = await fetchFiles();
-      setFiles(fetchedFiles);
-      setFilteredFiles(fetchedFiles);
-
-      const storageData = await fetchStorageInfo();
-      setStorage(storageData);
-    };
-
     loadData();
 
     // Agregar listener para actualizar la información tras una subida
@@ -106,6 +97,15 @@ const Dashboard = () => {
     setIsSliderOpen(false);
   };
 
+  const loadData = async () => {
+    const fetchedFiles = await fetchFiles();
+    setFiles(fetchedFiles);
+    setFilteredFiles(fetchedFiles);
+
+    const storageData = await fetchStorageInfo();
+    setStorage(storageData);
+  };
+
   return (
     <div className="flex flex-col items-center h-screen bg-gray-100 overflow-auto p-4">
       <Toolbar
@@ -123,7 +123,11 @@ const Dashboard = () => {
 
       {/* Panel Deslizante */}
       {isSliderOpen && selectedFile && (
-        <FileDetailSlider file={selectedFile} onClose={handleCloseSlider} />
+        <FileDetailSlider
+          file={selectedFile}
+          onClose={handleCloseSlider}
+          onUpdateDelete={loadData}
+        />
       )}
     </div>
   );

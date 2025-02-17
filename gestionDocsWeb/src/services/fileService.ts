@@ -151,3 +151,22 @@ export const download = async (fileId: string) => {
     console.error("Error obteniendo URL:", error);
   }
 };
+
+export const updateFile = async (file: StoredFile, newFileName: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/files/download/${file}`, {
+      responseType: "blob", // Indicar que la respuesta será un archivo (blob)
+    });
+
+    console.log(newFileName);
+
+    if (response.status !== 200) {
+      console.error("No se pudo obtener la URL de descarga.");
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Error obteniendo URL:", error);
+  }
+};

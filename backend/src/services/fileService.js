@@ -140,12 +140,20 @@ const getFiles = async (userId) => {
 
 const deleteFile = async (userId, fileId) => {
   const b2 = await initializeB2();
+  await b2.authorize();
 
   try {
-    const fileSnapshot = await db
-      .ref(`users/${userId}/files/${fileId}`)
-      .once("value");
-    const file = fileSnapshot.val();
+    const fileSnapshot = await db.ref(`users/${userId}/files`).once("value");
+    const files = fileSnapshot.val();
+
+    if (!files) {
+      throw new Error("No se encontraron archivos");
+    }
+
+    // Buscar el archivo por el ID de Backblaze
+    const file = Object.entries(files).find(
+      ([key, value]) => value.id === fileId
+    );
 
     if (!file) {
       throw new Error("Archivo no encontrado");
@@ -154,11 +162,14 @@ const deleteFile = async (userId, fileId) => {
     // Eliminar el archivo del servicio de almacenamiento
     await b2.deleteFileVersion({
       bucketId: bucketId,
-      fileName: file.name,
+      fileId: fileId,
+      fileName: file[1].name,
     });
 
+    const firebaseKey = file[0];
+
     // Eliminar el archivo de Firebase Database
-    await db.ref(`users/${userId}/files/${fileId}`).remove();
+    await db.ref(`users/${userId}/files/${firebaseKey}`).remove();
 
     return { message: "Archivo eliminado con éxito" };
   } catch (error) {
