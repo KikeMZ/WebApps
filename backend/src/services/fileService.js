@@ -221,10 +221,40 @@ const getDownloadUrl = async (fileId) => {
   }
 };
 
+const updateNameFile = async (userId, fileId, newFileName) => {
+  try {
+    const fileSnapshot = await db.ref(`users/${userId}/files`).once("value");
+    const files = fileSnapshot.val();
+
+    if (!files) {
+      throw new Error("No se encontraron archivos");
+    }
+
+    // Buscar el archivo por el ID de Backblaze
+    const file = Object.entries(files).find(
+      ([key, value]) => value.id === fileId
+    );
+
+    if (!file) {
+      throw new Error("Archivo no encontrado");
+    }
+
+    const firebaseKey = file[0];
+
+    // Actualiza solo el nombre
+    await db
+      .ref(`users/${userId}/files/${firebaseKey}`)
+      .update({ name: newFileName });
+  } catch (error) {
+    throw new Error(error.message || "Error desconocido");
+  }
+};
+
 module.exports = {
   uploadFile,
   getFiles,
   deleteFile,
   getStorage,
   getDownloadUrl,
+  updateNameFile,
 };

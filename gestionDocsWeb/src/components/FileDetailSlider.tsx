@@ -201,19 +201,21 @@ const FileDetailSlider = ({
       )}
 
       {isEditModalOpen && fileToEdit && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-xl font-semibold mb-4">Editar Nombre</h2>
+        <div className="pointer-events-auto fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-30">
+          <div className="w-[250px] flex flex-col p-4 relative items-center justify-center bg-white-800 border border-gray-800 shadow-lg rounded-2xl">
+            <h2 className="text-center p-3 flex-auto justify-center">
+              Editar Nombre
+            </h2>
             <input
               type="text"
-              className="w-full border border-gray-300 p-2 rounded mb-4"
+              className="w-full border border-gray-300 p-2 mb-4 rounded-full transition ease-in duration-300"
               value={newFileName}
               onChange={(e) => setNewFileName(e.target.value)}
             />
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className="mb-2 md:mb-0 px-5 py-2 text-sm shadow-xl font-medium text-black-300 rounded-full hover:bg-gray-300 transition ease-in duration-300"
               >
                 Cancelar
               </button>
@@ -222,7 +224,7 @@ const FileDetailSlider = ({
                   await handleSaveEdit();
                   setIsEditModalOpen(false);
                 }}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="mb-2 md:mb-0 px-5 py-2 text-sm shadow-xl font-medium text-white rounded-full bg-green-500 hover:bg-green-600 transition ease-in duration-300"
               >
                 Guardar
               </button>

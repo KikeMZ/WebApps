@@ -154,11 +154,13 @@ export const download = async (fileId: string) => {
 
 export const updateFile = async (file: StoredFile, newFileName: string) => {
   try {
-    const response = await axios.get(`${API_URL}/files/download/${file}`, {
-      responseType: "blob", // Indicar que la respuesta será un archivo (blob)
-    });
-
-    console.log(newFileName);
+    const userId = await getCurrentUserId();
+    const response = await axios.put(
+      `${API_URL}/files/update/${userId}/${file.id}`,
+      {
+        newFileName,
+      }
+    );
 
     if (response.status !== 200) {
       console.error("No se pudo obtener la URL de descarga.");

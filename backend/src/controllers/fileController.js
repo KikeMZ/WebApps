@@ -89,6 +89,26 @@ const urlDownload = async (req, res) => {
   }
 };
 
+const updateFile = async (req, res) => {
+  try {
+    const { userId, fileId } = req.params;
+    const { newFileName } = req.body;
+
+    if (!userId || !fileId || !newFileName) {
+      return res
+        .status(400)
+        .json({ error: "Se requiere un userId, fileId y fileName" });
+    }
+
+    // Llamar al servicio para eliminar el archivo
+    await fileService.updateNameFile(userId, fileId, newFileName);
+
+    res.status(200).json({ message: "Archivo actualizado" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 /*const trackUploadProgress = (req, res) => {
   const { userId } = req.params;
 
@@ -128,6 +148,7 @@ module.exports = {
   deleteFile,
   getStorage,
   urlDownload,
+  updateFile,
   //trackUploadProgress,
   //sendProgressUpdate,
 };
