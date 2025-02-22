@@ -1,1 +1,1 @@
-firebase react-icons
+firebase react-icons react-router-dom tailwindcss postcss autoprefixer vite @vitejs/plugin-react 
