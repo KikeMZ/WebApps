@@ -3,7 +3,7 @@ import {
   FaFileWord,
   FaFileExcel,
   FaThLarge,
-  FaPlus,
+  FaFileUpload,
   FaUserCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
@@ -75,7 +75,7 @@ const Toolbar = ({
           className="bg-gray-300 p-2 rounded-md flex items-center justify-center w-1/3"
           onClick={onNewUpload}
         >
-          <FaPlus />
+          <FaFileUpload />
         </button>
         <button
           className="bg-gray-300 p-2 rounded-md w-1/3 flex items-center justify-center"

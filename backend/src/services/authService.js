@@ -13,7 +13,7 @@ const register = async (email, password, username) => {
       email,
       dateCuenta: new Date().toISOString(),
       profilePicture:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Sample_User_Icon.svg/256px-Sample_User_Icon.svg.png?20240903184054",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/User_icon-cp.svg/256px-User_icon-cp.svg.png?20160122182132",
       storageLimit: 1,
     };
 

@@ -12,7 +12,7 @@ import {
   fetchStorageInfo,
   handleNewUpload,
 } from "../services/fileService";
-import ProgressBar from "../components/progressBar";
+import ProgressBar from "../components/ProgressBar";
 
 interface StoredFile {
   type: "pdf" | "document" | "spreadsheet";
@@ -75,8 +75,7 @@ const Dashboard = () => {
   };
 
   const handleConfig = () => {
-    // window.location.href = "/config";
-    console.log("Configuración");
+    navigate("/usuario");
   };
 
   const handleLogout = async () => {

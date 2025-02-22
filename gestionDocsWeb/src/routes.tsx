@@ -7,6 +7,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 
 // Protected
 import Dashboard from "./pages/Dashboard";
+import UserInfo from "./pages/UserInfo";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthProvider";
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/usuario" element={<UserInfo />} />
             {/* Agrega más rutas protegidas aquí */}
           </Route>
 

@@ -3,7 +3,7 @@ const { db } = require("../config/firebase");
 const busboy = require("busboy");
 
 const bucketId = process.env.B2_BUCKET_ID;
-const bucketName = process.env.B2_BUCKET_NAME;
+//const bucketName = process.env.B2_BUCKET_NAME;
 
 const uploadFile = async (req, userId) => {
   const b2 = await initializeB2();

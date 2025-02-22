@@ -6,6 +6,7 @@ require("./config/firebase");
 require("./config/backblaze");
 const authRoutes = require("./routes/authRoutes");
 const fileRoutes = require("./routes/fileRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 // Cargar variables de entorno
 dotenv.config();
@@ -21,6 +22,7 @@ app.use(express.json()); // Parsear el cuerpo de las solicitudes JSON
 // Rutas
 app.use("/api/auth", authRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("¡Bienvenido al backend!");
